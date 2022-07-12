@@ -22,16 +22,10 @@ namespace CustomerService.Repository
             _customerDb.Customers.Add(customer);
         }
 
-        public void DeleteCustomerById(int id)
-        {
-            /*_customerDb.Customers.Remove(Convert.ToString(id));*/
-            throw new NotImplementedException();
-        }
 
         public void DeleteCustomerByName(string name)
         {
-            /*_customerDb.Customers.Remove(name);*/
-            throw new NotImplementedException();
+            _customerDb.RemoveRange(name);
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -56,7 +50,7 @@ namespace CustomerService.Repository
 
         public void UpdateCustomer(Customer customer)
         {
-            throw new NotImplementedException();
+            _customerDb.Update(customer);
         }
     }
 }

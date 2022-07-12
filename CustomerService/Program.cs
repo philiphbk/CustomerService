@@ -4,21 +4,24 @@ using CustomerService.Repository;
 using CustomerService.Seeder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-/*using Microsoft.OpenApi.Models;*/
+using Microsoft.OpenApi.Models;
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AppDb");
 builder.Services.AddTransient<DataSeeder>();
-builder.Services.AddDbContext<CustomerDbContext>(opt => opt.UseInMemoryDatabase("InMem"));
-/*builder.Services.AddDbContext<CustomerDbContext>(x => x.UseSqlServer(connectionString));*/
+/*builder.Services.AddDbContext<CustomerDbContext>(opt => opt.UseInMemoryDatabase("InMem"));*/
+builder.Services.AddDbContext<CustomerDbContext>(x => x.UseSqlServer(connectionString));
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-/*builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo() { Title ="CustomerService", Version = "v1" });
-});*/
+});
+builder.Services.AddVersionedApiExplorer(options => options.SubstituteApiVersionInUrl = true);
 var app = builder.Build();
 
 
@@ -36,21 +39,22 @@ void SeedData(IHost app)
     }
 }
 
-/*if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}*/
+}
 
-/*app.UseSwagger(c =>
+app.UseSwagger(c =>
 {
     c.SerializeAsV2 = true;
 });
 
 app.UseSwaggerUI(c =>
 {
+    c.RoutePrefix = "swagger/ui";
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-});*/
+});
 
 app.MapGet("/", () => "Hello World!");
 

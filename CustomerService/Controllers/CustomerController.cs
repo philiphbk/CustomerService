@@ -3,13 +3,14 @@ using CustomerService.Dtos;
 using CustomerService.Model;
 using CustomerService.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CustomerService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/new")]
     [ApiController]
     public class CustomerController : ControllerBase
     {
@@ -56,9 +57,20 @@ namespace CustomerService.Controllers
             var readText = await System.IO.File.ReadAllTextAsync(db + "nigeria-state-and-lgas.json");
             var serializer = new JsonSerializer();
             using var stringReader = new StringReader(readText);
-            using (var jsonReader = new JsonTextReader(stringReader))
+            using (var jsonReader = new JsonTextReader(stringReader));
 
 
+            using (SqlCommand cmd =
+                   new SqlCommand("SELECT state FROM local_governemnts WHERE state_id = customerModel.LGA"))
+            {
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    
+                    reader.Read();
+                    customerModel.Residence = reader["LGA"].ToString();
+
+                }
+            }
 
 
             _repo.CreateCustomer(customerModel);
@@ -68,6 +80,24 @@ namespace CustomerService.Controllers
 
             return CreatedAtRoute(nameof(GetCustomerById), new {id = customerReadDto.Id}, customerReadDto);
            
+        }
+
+        [HttpPost]
+        public ActionResult<CustomerReadDto> UpdateCustomer(Customer customer)
+        {
+            var customerModel = _mapper.Map<Customer>(customer);
+            _repo.UpdateCustomer(customerModel);
+            _repo.SaveChanges();
+
+            return Ok(customerModel);
+        }
+
+        [HttpDelete]
+        public ActionResult<CustomerReadDto> DeleteCustomer(string name)
+        {
+            _repo.DeleteCustomerByName(name);
+            _repo.SaveChanges();
+            return Ok();
         }
     }
 }

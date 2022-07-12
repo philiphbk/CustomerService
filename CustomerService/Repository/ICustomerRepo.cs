@@ -13,7 +13,6 @@ namespace CustomerService.Repository
         Customer GetCustomerByName(string name);
         void CreateCustomer(Customer customer);
         void UpdateCustomer(Customer customer);
-        void DeleteCustomerById(int id);
         void DeleteCustomerByName(string name);
     }
 }
